@@ -1,6 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
 import { notFound } from "next/navigation";
+import { htmlFileExists, toHtmlRoute } from "@/lib/html-pages";
 
 type SlugPageProps = {
   params: Promise<{ slug: string }>;
@@ -9,18 +8,15 @@ type SlugPageProps = {
 export default async function SlugPage({ params }: SlugPageProps) {
   const { slug } = await params;
   const fileName = slug.endsWith(".html") ? slug : `${slug}.html`;
-  const htmlPath = path.join(process.cwd(), fileName);
 
-  if (!fs.existsSync(htmlPath)) {
+  if (!htmlFileExists(fileName)) {
     notFound();
   }
-
-  const html = fs.readFileSync(htmlPath, "utf8");
 
   return (
     <iframe
       title={`NeoChef ${slug}`}
-      srcDoc={html}
+      src={toHtmlRoute(fileName)}
       style={{ border: 0, width: "100%", height: "100vh", display: "block" }}
     />
   );
